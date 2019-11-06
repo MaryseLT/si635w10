@@ -1,0 +1,143 @@
+<?php
+// Create 2 form in Drupal
+// 3 items (array of 3 entry fields)
+// 2 different types (text field, select, radio buttons)
+
+function week9p1_menu(){ // Our Menu Function
+    $items = array();
+    $items['week9p1'] = array( // 1st form
+        'page callback' => 'week9p1_demo',
+        'access callback' => TRUE,
+        'title' => 'Week 9 Homework Form 1'
+    );
+    $items['week9p1a'] =  array( // 2nd form
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('week9p1a_form_demo2'),
+        'access callback' => TRUE,
+        'title' => 'Week 9 Homework Form 2'
+    );
+    return $items;
+}
+//////////////////////////////////////////////////////////////////
+// First Form - Week 9 Part 1
+//////////////////////////////////////////////////////////////////
+function week9p1_demo(){ // Rendering 1st Form
+    return drupal_get_form('week9p1_demo_form');
+    // Drupal API to render the function and get the form
+}
+
+function week9p1_demo_form(){ // 1st Form Function
+    $form = array();
+    $form['name'] = array( // Creating 1st entry field on the form
+        '#type' => 'textfield', // 1st type - Text Field
+        '#title' => t("What is your name?"),
+        '#required' => True, // Making this field required
+    );
+    $form['age'] = array( // Creating the 2nd entry field on the form
+        '#type' => 'textfield', // 2nd type - Text Field
+        '#title' => t("What year were you born?"),
+        '#required' => True,
+        '#size' => 4, // size of text field
+        '#maxlength' => 4, // max size of the text field
+    );
+    $form['food'] = array(
+        '#type' => 'select', // 3rd type - selection
+        '#title' => t("What is your favorite food group?"),
+        '#required' => True,
+        '#options' => array( // This is a major security risk
+            'grains' => t('Grains'),
+            'veggies' => t('Vegetables'),
+            'fruits' => t('Fruits'),
+            'dairy' => t('Dairy'),
+            'protein' => t('Protein'),
+        ),
+    );
+    $form['submit'] = array( // Creating the submit
+        '#type' => 'submit', // the submit button
+        '#value' => 'submit',
+    );
+    return $form;
+}
+
+function week9p1_demo_form_validate($form, &$form_state) {
+    // Validation function
+    if (!is_numeric($form_state['values']['age'])) {
+        // checks for non numeric submissions
+        form_set_error('age',t('Please enter your birth year using numbers.'));
+        // if it's not, this is the error message to the user
+    }
+}
+
+function week9p1_demo_form_submit($form, &$form_state) {
+    // creating a sentence w/ values & displaying it
+    $txt = $form_state['values']['name'] . " was born in " . $form_state['values']['age'] . " and their favorite food group is " .
+        $form_state['values']['food'];
+    drupal_set_message($txt);
+}
+//////////////////////////////////////////////////////////////////
+// Second Form - Week 9 Part 2
+//////////////////////////////////////////////////////////////////
+function week9p1a_brands() { // Function for Form 2 Dropdown
+    $car = array(); // creating an array to return the car makes
+    $car['honda'] = t('Hondas'); // RBG values
+    $car['ford'] = t('Fords');
+    $car['chevy'] = t('Chevys');
+    $car['subaru'] = t('Subarus');
+    $car['kia'] = t('Kias');
+    $car['toyota'] = t('Toyotas');
+    $car['bmw'] = t('BMWs');
+    return $car;
+}
+
+function week9p1a_models() { // Function for Form 2 Radios
+    $model = array(); // creating an array to return the car models
+    $model['civic'] = t('Honda Civics'); // RBG values
+    $model['fiesta'] = t('Ford Fiestas');
+    $model['colorado'] = t('Chevy Colorados');
+    $model['forestor'] = t('Subaru Forestors');
+    $model['sorento'] = t('Kia Sorentos');
+    $model['tacoma'] = t('Toyota Tacomas');
+    $model['x6'] = t('BMW X6');
+    return $model;
+}
+
+function week9p1a_form_demo2() { // 2nd Form
+    $form = array();
+    $form['name'] = array(
+        '#type' => 'textfield', // 1st type = Text Field
+        '#title' => t("What is your name?"),
+    );
+    $form['car1'] = array(
+        '#type' => 'select', // 2nd type - Select
+        '#options' => week9p1a_brands(), // call the function to populate drop down
+        '#title' => t("What is your favorite car brand?"),
+    );
+    $form['color2'] = array(
+        '#type' => 'radios', // 3rd type - Radio Buttons
+        '#options' => week9p1a_models(), // call the function to populate radios
+        '#title' => t("Please choose a car model."),
+    );
+    $form['submit'] = array( // Submission button
+        '#type' => 'submit',
+        '#value' => 'submit',
+    );
+    return $form;
+}
+
+function week9p1a_form_demo2_validate($form, &$form_state) {
+    // Validate the 2nd form
+}
+
+
+function week9p1a_form_demo2_submit($form, &$form_state) {
+    $brands = week9p1a_brands(); // calling brands function
+    $models = week9p1a_models(); // calling brands function
+    $brands1 = $brands[ $form_state['values']['brands']];
+    $models1 = $models[ $form_state['values']['models']];
+    $text = "My name is ".  $form_state['values']['name'] .
+        ", my favorite car brand is  " . $form_state['values']['brands1'] .
+        ", and I also like  " . $form_state['values']['models1'];
+
+    drupal_set_message($text); // writing the submitted message
+}
+
